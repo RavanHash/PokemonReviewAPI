@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using PokemonReviewApp;
 using PokemonReviewApp.Data;
+using PokemonReviewApp.Interfaces;
+using PokemonReviewApp.Repositories;
 
 internal class Program
 {
@@ -10,6 +12,8 @@ internal class Program
 
         builder.Services.AddControllers();
         builder.Services.AddTransient<Seed>();
+        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        builder.Services.AddScoped<IPokemonRepository, PokemonRepository>();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddDbContext<DataContext>(options =>
