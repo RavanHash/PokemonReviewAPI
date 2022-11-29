@@ -1,8 +1,13 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using PokemonReviewApp;
+using PokemonReviewApp.Configurations;
 using PokemonReviewApp.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Repositories;
+using System.Text;
 
 internal class Program
 {
@@ -14,12 +19,39 @@ internal class Program
         builder.Services.AddTransient<Seed>();
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         builder.Services.AddScoped<IPokemonRepository, PokemonRepository>();
+
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
         builder.Services.AddDbContext<DataContext>(options =>
         {
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
+
+        builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedEmail = false)
+            .AddEntityFrameworkStores<DataContext>();
+        builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+            .AddJwtBearer(options =>
+            {
+                var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JwtConfig:Secret").Value);
+
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false, // only for dev
+                    ValidateAudience = false, //only for dev
+                    RequireExpirationTime = false, //only for dev
+                    ValidateLifetime = true,
+                };
+            });
 
         var app = builder.Build();
 

@@ -1,5 +1,4 @@
-﻿//using AutoMapper;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
@@ -9,7 +8,7 @@ namespace PokemonReviewApp.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PokemonController : Controller
+public class PokemonController : ControllerBase
 {
     private readonly IPokemonRepository _pokemonRepository;
     private readonly IMapper _mapper;
