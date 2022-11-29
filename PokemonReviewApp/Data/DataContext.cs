@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Data;
 
-public class DataContext : DbContext
+public class DataContext : IdentityDbContext
 {
     public DataContext(DbContextOptions<DataContext> options) : base(options)
     {
@@ -20,6 +21,7 @@ public class DataContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<PokemonCategory>()
                 .HasKey(pc => new { pc.PokemonId, pc.CategoryId });
         modelBuilder.Entity<PokemonCategory>()
