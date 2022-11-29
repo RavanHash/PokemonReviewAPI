@@ -60,9 +60,45 @@ public class AuthenticationController : ControllerBase
             return BadRequest(new AuthenticationResult()
             {
                 Result = false,
-                Errors = new List<string>() { "Server error" } // how to display identity password error message?
+                Errors = isCreated.Errors.Select(E => E.Description).ToList()
             });
 
+        }
+
+        return BadRequest(ModelState);
+    }
+
+    [HttpPost]
+    [Route("login")]
+    public async Task<IActionResult> Login([FromBody] UserLoginRequestDto loginRequest)
+    {
+        if (ModelState.IsValid)
+        {
+            var existingUser = await userManager.FindByEmailAsync(loginRequest.Email);
+
+            if (existingUser == null)
+            {
+                return BadRequest(new AuthenticationResult()
+                {
+                    Result = false,
+                    Errors = new List<string>() { "couldn't find email" }
+                });
+            }
+
+            var isCorrect = await userManager.CheckPasswordAsync(existingUser, loginRequest.Password);
+
+            if (!isCorrect)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var jwtToken = GenerateJwtToken(existingUser);
+
+            return Ok(new AuthenticationResult()
+            {
+                Result = true,
+                Token = jwtToken
+            });
         }
 
         return BadRequest(ModelState);
