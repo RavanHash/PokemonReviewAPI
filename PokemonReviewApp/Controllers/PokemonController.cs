@@ -13,20 +13,20 @@ namespace PokemonReviewApp.Controllers;
 [ApiController]
 public class PokemonController : ControllerBase
 {
-    private readonly IPokemonRepository _pokemonRepository;
-    private readonly IMapper _mapper;
+    private readonly IPokemonRepository pokemonRepository;
+    private readonly IMapper mapper;
 
     public PokemonController(IPokemonRepository pokemonRepository, IMapper mapper)
     {
-        _pokemonRepository = pokemonRepository;
-        _mapper = mapper;
+        this.pokemonRepository = pokemonRepository;
+        this.mapper = mapper;
     }
 
     [HttpGet("allPokemons")]
     [ProducesResponseType(200, Type = typeof(IEnumerable<Pokemon>))]
     public IActionResult GetPokemons()
     {
-        var pokemons = _mapper.Map<List<PokemonDto>>(_pokemonRepository.GetPokemons());
+        var pokemons = mapper.Map<List<PokemonDto>>(pokemonRepository.GetPokemons());
 
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -39,10 +39,10 @@ public class PokemonController : ControllerBase
     [ProducesResponseType(400)]
     public IActionResult GetPokemon(int pokeId)
     {
-        if (!_pokemonRepository.PokemonExists(pokeId))
+        if (!pokemonRepository.PokemonExists(pokeId))
             return NotFound();
 
-        var pokemon = _mapper.Map<PokemonDto>(_pokemonRepository.GetPokemon(pokeId));
+        var pokemon = mapper.Map<PokemonDto>(pokemonRepository.GetPokemon(pokeId));
 
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -55,10 +55,10 @@ public class PokemonController : ControllerBase
     [ProducesResponseType(400)]
     public IActionResult GetPokemonRating(int pokeId)
     {
-        if (!_pokemonRepository.PokemonExists(pokeId))
+        if (!pokemonRepository.PokemonExists(pokeId))
             return NotFound();
 
-        var rating = _pokemonRepository.GetPokemonRating(pokeId);
+        var rating = pokemonRepository.GetPokemonRating(pokeId);
 
         if (!ModelState.IsValid)
             return BadRequest();

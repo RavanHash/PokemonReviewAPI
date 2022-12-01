@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -22,6 +23,14 @@ internal class Program
         builder.Services.AddScoped<IPokemonRepository, PokemonRepository>();
 
         builder.Services.AddEndpointsApiExplorer();
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
+        builder.Services.AddHttpLogging(options =>
+        {
+            //options.RequestHeaders.Add("Sec-CH-UA");
+            options.LoggingFields = HttpLoggingFields.All;
+            //options.ResponseHeaders.Add("");
+        });
         builder.Services.AddSwaggerGen(options =>
         {
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -102,6 +111,7 @@ internal class Program
             app.UseSwaggerUI();
         }
 
+        app.UseHttpLogging();
         app.UseHttpsRedirection();
         app.UseAuthorization();
         app.MapControllers();
