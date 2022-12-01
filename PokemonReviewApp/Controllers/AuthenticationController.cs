@@ -16,13 +16,10 @@ public class AuthenticationController : ControllerBase
     private readonly UserManager<IdentityUser> userManager;
     private readonly IConfiguration configuration;
 
-    private readonly ILogger<PokemonController> logger;
-
-    public AuthenticationController(UserManager<IdentityUser> userManager, IConfiguration configuration, ILogger<PokemonController> logger)
+    public AuthenticationController(UserManager<IdentityUser> userManager, IConfiguration configuration)
     {
         this.userManager = userManager;
         this.configuration = configuration;
-        this.logger = logger;
     }
 
     [HttpPost]
@@ -35,7 +32,6 @@ public class AuthenticationController : ControllerBase
 
             if (userExist != null)
             {
-                logger.Log(LogLevel.Error, "Email {rq} alredy exist", requestDto.Email);
                 return BadRequest(new AuthenticationResult()
                 {
                     Result = false,

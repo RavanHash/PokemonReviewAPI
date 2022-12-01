@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NLog;
+using NLog.Web;
 using PokemonReviewApp;
 using PokemonReviewApp.Configurations;
 using PokemonReviewApp.Data;
@@ -17,20 +18,26 @@ internal class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+
         builder.Services.AddControllers();
         builder.Services.AddTransient<Seed>();
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         builder.Services.AddScoped<IPokemonRepository, PokemonRepository>();
 
         builder.Services.AddEndpointsApiExplorer();
-        builder.Logging.ClearProviders();
-        builder.Logging.AddConsole();
-        builder.Services.AddHttpLogging(options =>
-        {
-            //options.RequestHeaders.Add("Sec-CH-UA");
-            options.LoggingFields = HttpLoggingFields.All;
-            //options.ResponseHeaders.Add("");
-        });
+
+
+        //builder.Logging.ClearProviders();
+        //builder.Logging.AddConsole();
+        //builder.Services.AddHttpLogging(options =>
+        //{
+        //    //options.RequestHeaders.Add("Sec-CH-UA");
+        //    options.LoggingFields = HttpLoggingFields.All;
+        //    //options.ResponseHeaders.Add("");
+        //});
+        //LogManager.LoadConfiguration(String.Concat(Directory.GetCurrentDirectory(), "nlog.config"));
+
         builder.Services.AddSwaggerGen(options =>
         {
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -88,6 +95,9 @@ internal class Program
                     ValidateLifetime = true,
                 };
             });
+
+        builder.Logging.ClearProviders();
+        builder.Host.UseNLog();
 
         var app = builder.Build();
 

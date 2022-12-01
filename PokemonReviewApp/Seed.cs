@@ -2,7 +2,6 @@
 using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp;
-
 public class Seed
 {
     private readonly DataContext dataContext;
